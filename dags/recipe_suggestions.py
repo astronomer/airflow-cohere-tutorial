@@ -26,7 +26,8 @@ IMAGE_PATH = "include/recipe_plot.png"
             ["Switzerland", "Norway", "New Zealand", "Cameroon", "Bhutan", "Chile"],
             type="array",
             title="Countries of recipe origin",
-            description="Enter from which countries you would like to get recipes. List at least two countries.",
+            description="Enter from which countries you would like to get recipes."
+            + "List at least two countries.",
         ),
         "pantry_ingredients": Param(
             ["gruyere", "olives", "potatoes", "onions", "pineapple"],
@@ -39,16 +40,16 @@ IMAGE_PATH = "include/recipe_plot.png"
             enum=["vegan", "vegetarian", "omnivore"],
             description="Select the type of recipe you'd like to get.",
         ),
-        "max_tokens_answer": Param(
+        "max_tokens_recipe": Param(
             500,
             type="integer",
             description="Enter the max number of tokens the model should generate.",
         ),
-        "randomness_of_answer": Param(
+        "randomness_of_recipe": Param(
             25,
             type="integer",
             description=(
-                "Enter the desired randomness of the answer on a scale"
+                "Enter the desired randomness of the recipe on a scale"
                 + "from 0 (no randomness) to 50 (full randomness). "
                 + "This setting corresponds to 10x the temperature setting in the Cohere API."
             ),
@@ -74,8 +75,8 @@ def recipe_suggestions():
     ):
         "Get recipes from the Cohere API for your pantry ingredients for a given country."
         type = context["params"]["type"]
-        max_tokens_answer = context["params"]["max_tokens_answer"]
-        randomness_of_answer = context["params"]["randomness_of_answer"]
+        max_tokens_answer = context["params"]["max_tokens_recipe"]
+        randomness_of_answer = context["params"]["randomness_of_recipe"]
         co = CohereHook(conn_id=cohere_conn_id).get_conn
 
         response = co.generate(
@@ -85,17 +86,22 @@ def recipe_suggestions():
             + "if you can't find a recipe that uses all of them, suggest an additional desert."
             + "Bonus points if it's a traditional recipe from that country, "
             + "you can name the city or region it's from and you can provide "
-            + "vegan alternatives for the ingredients." 
+            + "vegan alternatives for the ingredients."
             + "Provide the full recipe with all steps and ingredients.",
             max_tokens=max_tokens_answer,
             temperature=randomness_of_answer / 10,
         )
 
+        recipe = response.generations[0].text
+
         print(f"Your recipe from {country}")
         print(f"for the ingredients {', '.join(ingredients_list)} is:")
-        print(response)
+        print(recipe)
 
-        return response.generations[0].text
+        with open(f"include/{country}_recipe.txt", "w") as f:
+            f.write(recipe)
+
+        return recipe
 
     countries_list = get_countries_list()
     ingredients_list = get_ingredients_list()
