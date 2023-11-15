@@ -5,7 +5,7 @@ This repository contains the DAG code used in the [Orchestrate Cohere LLMs with 
 
 The DAG in this repository uses the following packages:
 
-- [Cohere Airflow provider](https://airflow.apache.org/docs/apache-airflow-providers-openai/stable/index.html).
+- [Cohere Airflow provider](https://airflow.apache.org/docs/apache-airflow-providers-cohere/stable/index.html).
 - [scikit-learn](https://scikit-learn.org/stable/).
 - [pandas](https://pandas.pydata.org/).
 - [numpy](https://numpy.org/).
